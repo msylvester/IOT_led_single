@@ -9,3 +9,4 @@ Motivation
 I wanted to play around with building an IOT device from scratch. 
 
 
+YouTubeVideo: https://youtu.be/IeutS_IkVbw
