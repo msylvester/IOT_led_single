@@ -1,0 +1,103 @@
+//Michael Sylvester
+//Computer Architecture
+//HW 2
+//1/28/2016
+
+day <- "Day"
+hour <- "Hour"
+minute <- "Minute"
+second <- "Second"
+message <- ""
+local tmTotal1 =0
+function setPage()
+{
+  local page = @"
+  <!DOCTYPE html>
+    <html>
+      <head>
+        <title>Mike's Form</title>
+      </head>
+      <body>
+        <h1>My Form</h1>
+        <form method='POST'>
+          <p>Day:<br>
+          <input type='text' name='sDay' value='" + day + @"'>
+          <p><i>Please enter how many days (0-248) from today you want light to go off</i></p>
+          <br>
+          <p>Hour:<br>
+          <input type='text' name='sHour' value='" + hour + @"'>
+          <br>
+          <p><i>Please enter the number of hours on that day (0-23)</i></p>
+          <p>Minute:<br>
+          <input type='text' name='sMinute' value='" + minute + @"'>
+          <br>
+          <p>Second:<br>
+          <input type='text' name='sSecond' value='" + second + @"'>
+          <br>
+           <p><i>Please enter the number of seconds on that day (0-59)</i></p>
+          <input type='submit' value='Submit'></p>
+        </form>
+                
+        <p>" + message + @"</p>
+      </body>
+    </html>"
+    
+    return page
+}
+
+http.onrequest(function(request, response)
+{ 
+  try 
+  {
+    local method = request.method.toupper()
+        
+    if (method == "POST") 
+    {
+      local data = http.urldecode(request.body);
+      
+      //Build Form
+      server.log("Hey the next line should be the day")
+      server.log(data.sDay)
+      day = data.sDay
+      hour = data.sHour
+      minute = data.sMinute
+      second = data.sSecond
+      //turn Days, hours, minutes into seconds
+      local tmDays = day.tointeger()*86400
+      local tmHours = hour.tointeger() * 3600
+      local tmMinute = minute.tointeger() *60
+     
+     //Get the number of seconds from now to turn on the light
+      tmTotal1 = tmDays + tmHours+tmMinute+second.tointeger()
+      device.send("time", tmTotal1)
+      server.log("tmTotal1 is " + tmTotal1)
+      server.log("Hour:" + hour)
+      server.log("Minute: " + minute)
+      server.log("Second: " + second)
+      server.log(date().time)
+      
+      //send info to device there was an error so used this block of code from 
+     // https://electricimp.com/docs/troubleshooting/nohandler/
+      imp.wakeup(1, function() {
+ 
+           server.log(tmTotal1);
+            device.send("set.led", tmTotal1); 
+        });
+
+      message = "Settings updated"
+      
+    }
+    else
+    {
+      message = ""
+    }
+        
+    response.send(200, setPage())
+  }
+  catch(error)
+  {
+    message = error
+    response.send(500, setPage())
+  }
+})
+

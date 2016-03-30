@@ -1,0 +1,40 @@
+//Michael Sylvester
+//Computer Architecture
+//HW 2
+//1/28/2016
+
+
+led <- hardware.pin9;
+
+// Configure 'led' to be a digital output with a starting value of digital 0 (low, 0V)
+led.configure(DIGITAL_OUT, 0);
+
+// Create a global variable to store current state of 'led'
+state <- 0;
+
+//start the light off
+led.write(0);
+
+//store the number of seconds until the led turns on
+local delayTime = 0;
+
+//turn light on when called
+function lightOn() {
+    
+    led.write(1);
+}
+
+
+ 
+
+function getTime(time) {
+    
+    delayTime=time;
+   server.log(delayTime);
+   imp.wakeup(delayTime,lightOn);
+    
+}
+server.log("helo world");
+  agent.on("set.led", getTime);
+// Start the loop
+//blink();
